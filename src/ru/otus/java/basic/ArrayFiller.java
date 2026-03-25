@@ -43,10 +43,12 @@ public class ArrayFiller {
                 executor.submit(new ArrayFillerTask(array, start, end));
             }
 
-            // Завершаем приём новых задач и ждём завершения всех запущенных
             executor.shutdown();
             try {
-                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                boolean finished = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+                if (!finished) {
+                    executor.shutdownNow();
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.err.println("Ожидание потоков было прервано");
